@@ -1,4 +1,4 @@
-package com.northstarcomm.core_services.util.testing;
+package com.northstarcomm.test_services.util.testing;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -6,7 +6,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.Properties;
 
-import static com.northstarcomm.core_services.util.testing.TestAssistant.readPropertiesFile;
+import static com.northstarcomm.test_services.util.testing.TestAssistant.readPropertiesFile;
 import static org.junit.Assert.*;
 
 @RunWith(MockitoJUnitRunner.class)
