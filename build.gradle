@@ -1,0 +1,111 @@
+buildscript {
+    repositories{
+        mavenCentral()
+        mavenLocal()
+        maven{
+            url "${artifactory_contextUrl}/test-gradle-dev-local"
+            credentials{
+                username = "${artifactory_user}"
+                password = "${artifactory_password}"
+            }
+        }
+    }
+    dependencies { classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.16.1" }
+}
+
+
+
+plugins {
+    id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+    id 'org.springframework.boot' version '2.7.5'
+    id 'java'
+    id "maven-publish"
+    id "com.jfrog.artifactory" version "4.16.1"
+}
+
+apply plugin: "com.jfrog.artifactory"
+configurations {
+    deployerJars
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '11'
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    maven{
+        url "${artifactory_contextUrl}/test-gradle-dev-local"
+        credentials{
+            username = "${artifactory_user}"
+            password = "${artifactory_password}"
+        }
+    }
+}
+
+dependencies {
+    implementation 'com.github.derjust:spring-data-dynamodb:5.1.0'
+    implementation 'com.amazonaws:aws-java-sdk-dynamodb:1.12.322'
+
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter'
+    implementation 'org.springframework.data:spring-data-releasetrain:Neumann-SR9'
+//    implementation 'org.projectlombok:lombok:1.18.22'
+    implementation 'junit:junit:4.13.1'
+    implementation 'org.junit.jupiter:junit-jupiter:5.8.1'
+    implementation 'commons-io:commons-io:2.11.0'
+}
+
+artifactory {
+    contextUrl = "${artifactory_contextUrl}"
+    publish {
+        repository {
+            repoKey = 'test-gradle-dev-local'
+            username = "${artifactory_user}"
+            password = "${artifactory_password}"
+            maven = true
+        }
+        defaults {
+            publications('mavenJava')
+        }
+        publishBuildInfo = true
+        publishArtifacts = true
+        publishPom = true
+    }
+    resolve {
+        repository {
+            repoKey = 'test-gradle-dev-local'
+            username = "${artifactory_user}"
+            password = "${artifactory_password}"
+            maven = true
+
+        }
+    }
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+        }
+    }
+}
+
+wrapper {
+    gradleVersion = '7.6.1'
+}
+
+allprojects {
+    apply plugin: "com.jfrog.artifactory"
+}
+
+task install(dependsOn: "publishToMavenLocal")
+
+
